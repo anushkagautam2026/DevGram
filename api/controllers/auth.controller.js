@@ -102,3 +102,24 @@ export const google=async(req,res,next)=>{
     console.log(error)
   }
 }
+export const updateProfile = async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: 'No file uploaded' });
+  }
+  console.log("Uploaded File Metadata:", req.file);
+  console.log("Cloudinary Image Path:", req.file.path);
+  const { userId, profilePicture } = req.body;
+  try {
+    // You would update the user's profile in your database here, for example:
+    // await User.updateOne({ _id: userId }, { profilePicture });
+
+    res.status(200).json({
+      success: true,
+      message: 'Profile updated successfully',
+      profilePicture,
+    });
+  } catch (error) {
+    console.error('Profile update error:', error);
+    res.status(500).json({ success: false, message: 'Profile update failed' });
+  }
+};
