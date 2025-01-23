@@ -1,4 +1,4 @@
-
+import { Link } from 'react-router-dom';
 import { Button, TextInput,Alert,Modal, ModalBody } from 'flowbite-react';
 import { useRef, useState } from 'react';
 import { HiOutlineExclamationCircle } from 'react-icons/hi';
@@ -198,6 +198,17 @@ export default function DashProfile() {
         <Button type="submit" gradientDuoTone="purpleToBlue" outline>
           Update
         </Button>
+        {currentUser.isAdmin && (
+          <Link to={'/create-post'}>
+            <Button
+              type='button'
+              gradientDuoTone='purpleToPink'
+              className='w-full'
+            >
+              Create a post
+            </Button>
+          </Link>
+        )}
       </form>
 
       {/* Footer Options */}
