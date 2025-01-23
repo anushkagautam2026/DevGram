@@ -53,37 +53,14 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
-// export const updateProfilePicture = async (req, res) => {
-//   try {
-//     const { userId } = req.params; // Get userId from the route parameter
-//     const { profilePicture } = req.body; // Cloudinary URL from the request body
-
-//     // Check if required data is present
-//     if (!userId) {
-//       return res.status(400).json({ success: false, message: 'User ID is required' });
-//     }
-
-//     if (!profilePicture) {
-//       return res.status(400).json({ success: false, message: 'Profile picture URL is required' });
-//     }
-
-//     // Update the profile picture in the database
-//     const updatedUser = await User.findByIdAndUpdate(
-//       userId, // User ID from the route parameter
-//       { profilePicture }, // Update only the profilePicture field
-//       { new: true } // Return the updated user document
-//     );
-
-//     // Check if the user was found and updated
-//     if (!updatedUser) {
-//       return res.status(404).json({ success: false, message: 'User not found' });
-//     }
-
-//     // Respond with the updated user details (excluding password for security)
-//     const { password, ...rest } = updatedUser._doc;
-//     res.status(200).json({ success: true, updatedUser: rest });
-//   } catch (error) {
-//     console.error('Error updating profile picture:', error);
-//     res.status(500).json({ success: false, message: 'Error updating profile picture' });
-//   }
-// };
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.userId) {
+    return next(errorHandler(403, 'You are not allowed to delete this user'));
+  }
+  try {
+    await User.findByIdAndDelete(req.params.userId);
+    res.status(200).json('User has been deleted');
+  } catch (error) {
+    next(error);
+  }
+};
