@@ -1,9 +1,10 @@
 
 import { Button, TextInput,Alert,Modal, ModalBody } from 'flowbite-react';
-import { useRef, useState } from 'react';import { HiOutlineExclamationCircle } from 'react-icons/hi';
+import { useRef, useState } from 'react';
+import { HiOutlineExclamationCircle } from 'react-icons/hi';
 import { useDispatch, useSelector } from 'react-redux';
-import { signInStart, signInSuccess, signInFailure ,deleteUserStart,deleteUserSuccess,deleteUserFailure} from '../redux/user/userSlice'; // Import actions
-import { updateStart,updateSuccess,updateFailure } from '../redux/user/userSlice';
+import { signInStart, signInSuccess, signInFailure ,deleteUserStart,deleteUserSuccess,deleteUserFailure,
+  updateStart,updateSuccess,updateFailure,signoutSuccess} from '../redux/user/userSlice';
 export default function DashProfile() {
   const dispatch = useDispatch();
   const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
@@ -106,7 +107,7 @@ export default function DashProfile() {
       const data = await res.json();
   
       if (!res.ok) {
-        dispatch(updateFailure(data.message)); // Dispatch failure action
+        dispatch(updateUserError(data.message)); // Dispatch failure action
         setUpdateUserError(data.message);
         return;
       }
@@ -134,6 +135,22 @@ export default function DashProfile() {
       }
     } catch (error) {
       dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleSignout = async () => {
+    try {
+      const res = await fetch('/api/user/signout', {
+        method: 'POST',
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        console.log(data.message);
+      } else {
+        dispatch(signoutSuccess());
+      }
+    } catch (error) {
+      console.log(error.message);
     }
   };
   return (
@@ -186,7 +203,7 @@ export default function DashProfile() {
       {/* Footer Options */}
       <div className="text-red-500 flex justify-between mt-5">
         <span onClick={()=>setShowModal(true)}className="cursor-pointer">Delete Account</span>
-        <span className="cursor-pointer">Sign Out</span>
+        <span onClick={handleSignout}className="cursor-pointer">Sign Out</span>
       </div>
       {updateUserSuccess && (
         <Alert color='success' className='mt-5'>
