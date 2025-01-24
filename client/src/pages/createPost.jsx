@@ -1,8 +1,9 @@
 import { Alert, Button, FileInput, Select, TextInput } from 'flowbite-react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { app } from '../firebase';
 import { useState } from 'react';
+import { CircularProgressbar } from 'react-circular-progressbar';
+import 'react-circular-progressbar/dist/styles.css';
 import { useNavigate } from 'react-router-dom';
 
 export default function CreatePost() {
@@ -13,6 +14,46 @@ export default function CreatePost() {
   const [publishError, setPublishError] = useState(null);
 
   const navigate = useNavigate();
+
+  const handleUploadImage = async () => {
+    try {
+      if (!file) {
+        setImageUploadError('Please select an image');
+        return;
+      }
+      setImageUploadError(null);
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'DevGram'); // Replace with your Cloudinary upload preset
+
+      const options = {
+        method: 'POST',
+        body: formData,
+      };
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/drgj9mmoh/image/upload`, // Replace with your Cloudinary cloud name
+        options
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setImageUploadError('Image upload failed');
+        setImageUploadProgress(null);
+        return;
+      }
+
+      setImageUploadProgress(null);
+      setImageUploadError(null);
+      setFormData((prevFormData) => ({ ...prevFormData, image: data.secure_url }));
+    } catch (error) {
+      setImageUploadError('Image upload failed');
+      setImageUploadProgress(null);
+      console.error(error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,14 +71,13 @@ export default function CreatePost() {
         return;
       }
 
-      if (res.ok) {
-        setPublishError(null);
-        navigate(`/post/${data.slug}`);
-      }
+      setPublishError(null);
+      navigate(`/post/${data.slug}`);
     } catch (error) {
       setPublishError('Something went wrong');
     }
   };
+
   return (
     <div className='p-3 max-w-3xl mx-auto min-h-screen'>
       <h1 className='text-center text-3xl my-7 font-semibold'>Create a post</h1>
@@ -75,10 +115,22 @@ export default function CreatePost() {
             gradientDuoTone='purpleToBlue'
             size='sm'
             outline
-          >Upload Image
+            onClick={handleUploadImage}
+            disabled={imageUploadProgress}
+          >
+            {imageUploadProgress ? (
+              <div className='w-16 h-16'>
+                <CircularProgressbar
+                  value={imageUploadProgress}
+                  text={`${imageUploadProgress || 0}%`}
+                />
+              </div>
+            ) : (
+              'Upload Image'
+            )}
           </Button>
         </div>
-        
+        {imageUploadError && <Alert color='failure'>{imageUploadError}</Alert>}
         {formData.image && (
           <img
             src={formData.image}
@@ -95,7 +147,6 @@ export default function CreatePost() {
             setFormData({ ...formData, content: value });
           }}
         />
-        
         <Button type='submit' gradientDuoTone='purpleToPink'>
           Publish
         </Button>
