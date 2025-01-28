@@ -56,6 +56,17 @@ const handleSignout = async () => {
             </Sidebar.Item>
           </Link>
           {currentUser.isAdmin && (
+            <Link to='/dashboard?tab=dash'>
+              <Sidebar.Item
+                active={tab === 'dash'}
+                icon={HiChartPie}
+                as='div'
+              >
+                Dashboard
+              </Sidebar.Item>
+            </Link>
+          )}
+          {currentUser.isAdmin && (
             <Link to='/dashboard?tab=posts'>
               <Sidebar.Item
                 active={tab === 'posts'}
@@ -70,7 +81,7 @@ const handleSignout = async () => {
             <Link to='/dashboard?tab=users'>
               <Sidebar.Item
                 active={tab === 'users'}
-                icon={HiDocumentText}
+                icon={HiOutlineUserGroup}
                 as='div'
               >
                 Users
@@ -81,13 +92,14 @@ const handleSignout = async () => {
             <Link to='/dashboard?tab=comments'>
               <Sidebar.Item
                 active={tab === 'comments'}
-                icon={HiDocumentText}
+                icon={HiAnnotation}
                 as='div'
               >
                 Comments
               </Sidebar.Item>
             </Link>
           )}
+          
                 <Sidebar.Item  onClick={handleSignout}icon={HiArrowSmRight} className='cursor-pointer'>
                     Signout
                 </Sidebar.Item>
