@@ -77,6 +77,17 @@ const handleSignout = async () => {
               </Sidebar.Item>
             </Link>
           )}
+          {currentUser.isAdmin && (
+            <Link to='/dashboard?tab=comments'>
+              <Sidebar.Item
+                active={tab === 'comments'}
+                icon={HiDocumentText}
+                as='div'
+              >
+                Comments
+              </Sidebar.Item>
+            </Link>
+          )}
                 <Sidebar.Item  onClick={handleSignout}icon={HiArrowSmRight} className='cursor-pointer'>
                     Signout
                 </Sidebar.Item>
