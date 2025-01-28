@@ -1,41 +1,45 @@
-import User from '../models/user.model.js'
-import bcryptjs from 'bcryptjs';
-import {errorHandler} from '../utils/error.js'
-import jwt from 'jsonwebtoken';
-export const signup=async(req,res,next)=>{
-    const { username, email, password } = req.body;
-
-    if (!username || !email || !password || username === '' || password === '' || email === '') {
-      return next(errorHandler(400,'All fields are required'));
-    }
-    const hashedPassword = bcryptjs.hashSync(password, 10);
-    const newUser = new User({
-      username,
-      email,
-      password:hashedPassword,
-    });
-    try{
-   await newUser.save();
-   res.json('signup successful');
-    }catch(error){
-        next(error);
-    }
+import User from "../models/user.model.js";
+import bcryptjs from "bcryptjs";
+import { errorHandler } from "../utils/error.js";
+import jwt from "jsonwebtoken";
+export const signup = async (req, res, next) => {
+  const { username, email, password } = req.body;
+  if (
+    !username ||
+    !email ||
+    !password ||
+    username === "" ||
+    password === "" ||
+    email === ""
+  ) {
+    return next(errorHandler(400, "All fields are required"));
+  }
+  const hashedPassword = bcryptjs.hashSync(password, 10);
+  const newUser = new User({
+    username,
+    email,
+    password: hashedPassword,
+  });
+  try {
+    await newUser.save();
+    res.json("signup successful");
+  } catch (error) {
+    next(error);
+  }
 };
 export const signin = async (req, res, next) => {
   const { email, password } = req.body;
-
-  if (!email || !password || email === '' || password === '') {
-    return next(errorHandler(400, 'All fields are required'));
+  if (!email || !password || email === "" || password === "") {
+    return next(errorHandler(400, "All fields are required"));
   }
-
   try {
     const validUser = await User.findOne({ email });
     if (!validUser) {
-      return next(errorHandler(404, 'User not found'));
+      return next(errorHandler(404, "User not found"));
     }
     const validPassword = bcryptjs.compareSync(password, validUser.password);
     if (!validPassword) {
-      return next(errorHandler(400, 'Invalid password'));
+      return next(errorHandler(400, "Invalid password"));
     }
     const token = jwt.sign(
       { id: validUser._id, isAdmin: validUser.isAdmin },
@@ -46,7 +50,7 @@ export const signin = async (req, res, next) => {
 
     res
       .status(200)
-      .cookie('access_token', token, {
+      .cookie("access_token", token, {
         httpOnly: true,
       })
       .json(rest);
@@ -55,9 +59,9 @@ export const signin = async (req, res, next) => {
   }
 };
 
-export const google=async(req,res,next)=>{
-  const {email,name,googlePhotoUrl}=req.body;
-  try{
+export const google = async (req, res, next) => {
+  const { email, name, googlePhotoUrl } = req.body;
+  try {
     const user = await User.findOne({ email });
     if (user) {
       const token = jwt.sign(
@@ -65,10 +69,10 @@ export const google=async(req,res,next)=>{
         process.env.JWT_SECRET
       );
       const { password, ...rest } = user._doc;
-      console.log('Profile Picture:', profilePicture);
+      console.log("Profile Picture:", profilePicture);
       res
         .status(200)
-        .cookie('access_token', token, {
+        .cookie("access_token", token, {
           httpOnly: true,
         })
         .json(rest);
@@ -79,7 +83,7 @@ export const google=async(req,res,next)=>{
       const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
       const newUser = new User({
         username:
-          name.toLowerCase().split(' ').join('') +
+          name.toLowerCase().split(" ").join("") +
           Math.random().toString(9).slice(-4),
         email,
         password: hashedPassword,
@@ -93,21 +97,23 @@ export const google=async(req,res,next)=>{
       const { password, ...rest } = newUser._doc;
       res
         .status(200)
-        .cookie('access_token', token, {
+        .cookie("access_token", token, {
           httpOnly: true,
         })
         .json(rest);
     }
-  }catch(error){
-    console.log(error)
+  } catch (error) {
+    console.log(error);
   }
-}
+};
 export const updateProfile = async (req, res) => {
   if (!req.file) {
-    return res.status(400).json({ success: false, message: 'No file uploaded' });
+    return res
+      .status(400)
+      .json({ success: false, message: "No file uploaded" });
   }
-  console.log("Uploaded File Metadata:", req.file);
-  console.log("Cloudinary Image Path:", req.file.path);
+  // console.log("Uploaded File Metadata:", req.file);
+  // console.log("Cloudinary Image Path:", req.file.path);
   const { userId, profilePicture } = req.body;
   try {
     // You would update the user's profile in your database here, for example:
@@ -115,11 +121,11 @@ export const updateProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Profile updated successfully',
+      message: "Profile updated successfully",
       profilePicture,
     });
   } catch (error) {
-    console.error('Profile update error:', error);
-    res.status(500).json({ success: false, message: 'Profile update failed' });
+    console.error("Profile update error:", error);
+    res.status(500).json({ success: false, message: "Profile update failed" });
   }
 };
