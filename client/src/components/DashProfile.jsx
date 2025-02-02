@@ -107,7 +107,7 @@ export default function DashProfile() {
       const data = await res.json();
   
       if (!res.ok) {
-        dispatch(updateUserError(data.message)); // Dispatch failure action
+        //dispatch(updateUserError(data.message)); // Dispatch failure action
         setUpdateUserError(data.message);
         return;
       }
