@@ -10,7 +10,7 @@ export default function Search() {
     category: 'uncategorized',
   });
 
-  console.log(sidebarData);
+ 
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -34,12 +34,14 @@ export default function Search() {
   
     const fetchPosts = async () => {
       setLoading(true);
+      if (sidebarData.category === 'uncategorized') {
+        urlParams.delete('category'); // Remove category filter if it's 'uncategorized'
+      }
       const searchQuery = urlParams.toString();
       try {
         const res = await fetch(`/api/post/getposts?${searchQuery}`);
         if (!res.ok) throw new Error(`HTTP Error! Status: ${res.status}`);
         const data = await res.json();
-        console.log('Fetched Posts:', data); // Debugging log
         setPosts(data.posts || []);
         setShowMore(data.posts.length === 9);
       } catch (error) {
@@ -71,8 +73,9 @@ export default function Search() {
     const urlParams = new URLSearchParams();
     if (sidebarData.searchTerm) urlParams.set('searchTerm', sidebarData.searchTerm);
     if (sidebarData.sort) urlParams.set('sort', sidebarData.sort);
-    if (sidebarData.category) urlParams.set('category', sidebarData.category);
-  
+    if (sidebarData.category && sidebarData.category !== 'uncategorized') {
+      urlParams.set('category', sidebarData.category);
+    }
     navigate(`/search?${urlParams.toString()}`);
   };
 

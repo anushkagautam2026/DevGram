@@ -55,34 +55,70 @@ export default function CommentSection({ postId }) {
     };
     getComments();
   }, [postId]);
-
   const handleLike = async (commentId) => {
     try {
       if (!currentUser) {
         navigate('/sign-in');
         return;
       }
+  
+      console.log('Current User:', currentUser);
+      console.log('Token being sent:', currentUser?.token); // Debugging line
+  
       const res = await fetch(`/api/comment/likeComment/${commentId}`, {
         method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${currentUser?.token}`, // Ensure token is included
+        },
       });
-      if (res.ok) {
-        const data = await res.json();
-        setComments(
-          comments.map((comment) =>
-            comment._id === commentId
-              ? {
-                  ...comment,
-                  likes: data.likes,
-                  numberOfLikes: data.likes.length,
-                }
-              : comment
-          )
-        );
+  
+      if (!res.ok) {
+        const errorMessage = await res.text(); // Get detailed error
+        console.error('Failed to like comment:', errorMessage);
+        return;
       }
+  
+      const data = await res.json();
+      setComments(
+        comments.map((comment) =>
+          comment._id === commentId
+            ? { ...comment, likes: data.likes, numberOfLikes: data.likes.length }
+            : comment
+        )
+      );
     } catch (error) {
       console.log(error.message);
     }
   };
+  
+  // const handleLike = async (commentId) => {
+  //   try {
+  //     if (!currentUser) {
+  //       navigate('/sign-in');
+  //       return;
+  //     }
+  //     const res = await fetch(`/api/comment/likeComment/${commentId}`, {
+  //       method: 'PUT',
+  //     });
+  //     if (res.ok) {
+  //       const data = await res.json();
+  //       setComments(
+  //         comments.map((comment) =>
+  //           comment._id === commentId
+  //             ? {
+  //                 ...comment,
+  //                 likes: data.likes,
+  //                 numberOfLikes: data.likes.length,
+  //               }
+  //             : comment
+  //         )
+  //       );
+  //     }
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
 
   const handleEdit = async (comment, editedContent) => {
     setComments(

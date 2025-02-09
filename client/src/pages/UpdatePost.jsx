@@ -20,6 +20,7 @@ export default function UpdatePost() {
 
   useEffect(() => {
     try {
+      console.log("form data: ",formData);
       const fetchPost = async () => {
         const res = await fetch(`/api/post/getposts?postId=${postId}`);
         const data = await res.json();
@@ -79,11 +80,12 @@ export default function UpdatePost() {
       console.error(error);
     }
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
-      const res = await fetch(`/api/post/updatepost/${formData._id}/${currentUser._id}`, {
+      console.log("formdata id",formData._id);
+      const res = await fetch(`/api/post/updatepost/${postId}/${currentUser._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -115,13 +117,13 @@ export default function UpdatePost() {
             id='title'
             className='flex-1'
             onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
+              setFormData({ ...formData, title: e.target.value.trim() })
             }
             value={formData.title}
           />
           <Select
             onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
+              setFormData({ ...formData, category: e.target.value.trim() })
             }
             value={formData.category}
           >

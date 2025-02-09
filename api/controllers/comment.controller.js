@@ -33,6 +33,33 @@ export const getPostComments = async (req, res, next) => {
     next(error);
   }
 };
+// export const likeComment = async (req, res) => {
+//   try {
+//     console.log('Received a like request for comment:', req.params.commentId);
+//     console.log('User ID:', req.user?.id); // Ensure user ID is extracted from token
+
+//     const { commentId } = req.params;
+//     const comment = await Comment.findById(commentId);
+
+//     if (!comment) {
+//       return res.status(404).json({ message: 'Comment not found' });
+//     }
+
+//     const userId = req.user.id;
+
+//     if (comment.likes.includes(userId)) {
+//       comment.likes = comment.likes.filter((id) => id !== userId);
+//     } else {
+//       comment.likes.push(userId);
+//     }
+
+//     await comment.save();
+//     res.json({ likes: comment.likes });
+//   } catch (error) {
+//     console.error('Error in likeComment:', error);
+//     res.status(500).json({ message: error.message });
+//   }
+// };
 
 export const likeComment = async (req, res, next) => {
   try {
